@@ -1,14 +1,14 @@
 [project]
 name = "fastsort"
 version = "0.1.0"
-description = "Add your description here"
+description = "An exploration of fast Rust sorting algorithms in Python."
 readme = "README.md"
 authors = [
     { name = "David Muhr", email = "muhrdavid+github@gmail.com" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
-    "numpy>=2.2.4",
+    "numpy>=1.20",
 ]
 
 [tool.maturin]
