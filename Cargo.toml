@@ -1,0 +1,24 @@
+[package]
+name = "fastsort"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85.1"
+
+[lib]
+name = "_core"
+# "cdylib" is necessary to produce a shared library for Python to import from.
+crate-type = ["cdylib"]
+
+# some optimizations from:
+# https://nnethercote.github.io/perf-book/build-configuration.html
+[profile.release]
+strip = "symbols"
+codegen-units = 1
+lto = "fat"
+
+[dependencies]
+# "extension-module" tells pyo3 we want to build an extension module (skips linking against libpython.so)
+# "abi3-py310" tells pyo3 (and maturin) to build using the stable ABI with minimum Python version 3.10
+pyo3 = { version = "0.24.0", features = ["extension-module", "abi3-py310"] }
+numpy = { version = "0.24.0" }
+rayon = "1.10.0"
