@@ -1,6 +1,7 @@
 # fastsort
 
 An exploration of fast Rust sorting algorithms in Python.
+Run ``pip install fastsort`` to install the package.
 
 ```py
 import numpy as np
@@ -21,7 +22,8 @@ The library is in its early stages, and while further performance optimizations 
 - Use ``uv sync`` to install dependencies from the lock file.
 - Use ``uv lock`` to update the lock file if necessary given the pinned dependencies.
 - Use ``uv lock --upgrade`` to upgrade the lock file the latest valid dependencies.
-- Use ``uv build && uv pip install --no-deps --force-reinstall  --editable .`` to build the package and install it locally.
+- Use ``uv build `` to build the package.
+- Use ``uv pip install --editable .`` to install the package.
 - Use ``uv run pytest tests`` to test the local package.
 
-It might happen that the host ``github.com`` is not trusted, in this case use ``uv sync --allow-insecure-host https://github.com`` if you trust ``github.com``.
+During development its useful to run ``uv build && uv pip install --no-deps --force-reinstall  --editable .``, which builds and re-installs the built package.
