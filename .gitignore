@@ -14,3 +14,7 @@ target/
 
 # Notebooks
 notebooks/
+
+# Reports
+*.json
+*.png
