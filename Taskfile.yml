@@ -1,0 +1,54 @@
+version: "3"
+
+vars:
+    SOURCES: src tests bench
+
+tasks:
+    lint:
+        cmds:
+            - uv run black --diff --check --config pyproject.toml {{.SOURCES}}
+            - uv run ruff check
+
+    format:
+        cmds:
+            - uv run black --config pyproject.toml {{.SOURCES}}
+            - uv run ruff check --config pyproject.toml --fix
+
+    test:
+        cmds:
+            - uv run pytest -rsx -c pyproject.toml
+
+    typing:
+        cmd: uv run pyright
+
+    typing-quality:
+        cmd: uv run pyright --ignoreexternal --verifytypes fastsort
+
+    check:
+        cmds:
+            -   task: lint
+            -   task: typing
+            -   task: test
+
+    build:
+        cmd: uv build
+
+    install:
+        cmd: uv pip install --editable .
+
+    reinstall:
+        cmd: uv pip install --no-deps --force-reinstall  --editable .
+
+    rebuild:
+        cmds:
+            - task: build
+            - task: reinstall
+
+    benchmark:
+        cmd: uv run bench/benchmark.py {{.CLI_ARGS}}
+
+    experiment:
+        cmd: uv run bench/experiment.py {{.CLI_ARGS}}
+
+    visualize:
+        cmd: uv run bench/visualize.py {{.CLI_ARGS}}

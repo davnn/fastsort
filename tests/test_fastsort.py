@@ -41,7 +41,7 @@ test_data = [  # extend the test data with all possible dimension variants
 ]
 
 
-@pytest.mark.parametrize("data, axis", test_data)
+@pytest.mark.parametrize(("data", "axis"), test_data)
 def test_sort_shape_and_type(data: TestDataT, axis: TestAxisT) -> None:
     sort_data = sort(data, axis=axis)
     assert sort_data.dtype == data.dtype
@@ -52,7 +52,7 @@ def test_sort_shape_and_type(data: TestDataT, axis: TestAxisT) -> None:
         assert sort_data.shape == (data.size,)
 
 
-@pytest.mark.parametrize("data, axis", test_data)
+@pytest.mark.parametrize(("data", "axis"), test_data)
 def test_argsort_shape_and_type(data: TestDataT, axis: TestAxisT) -> None:
     sort_data = argsort(data, axis=axis)
     assert sort_data.dtype == np.int64
@@ -63,14 +63,14 @@ def test_argsort_shape_and_type(data: TestDataT, axis: TestAxisT) -> None:
         assert sort_data.shape == (data.size,)
 
 
-@pytest.mark.parametrize("data, axis", test_data)
+@pytest.mark.parametrize(("data", "axis"), test_data)
 def test_sort_increasing(data: TestDataT, axis: TestAxisT) -> None:
     sort_data = sort(data, axis=axis)
     sort_diff = np.diff(sort_data, axis=axis if axis is not None else 0)
     assert np.all(sort_diff >= 0.0)
 
 
-@pytest.mark.parametrize("data, axis", test_data)
+@pytest.mark.parametrize(("data", "axis"), test_data)
 def test_argsort_increasing(data: TestDataT, axis: TestAxisT) -> None:
     sort_idx = argsort(data, axis=axis)
     sort_data = np.take_along_axis(data, sort_idx, axis=axis) if axis is not None else data.take(sort_idx)
