@@ -1,7 +1,7 @@
 [project]
 name = "fastsort"
 version = "0.1.0"
-description = "An exploration of fast Rust sorting algorithms in Python."
+description = "A high-performance sorting library for NumPy arrays."
 readme = "README.md"
 authors = [
     { name = "David Muhr", email = "muhrdavid+github@gmail.com" }
@@ -9,6 +9,17 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.20",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "matplotlib>=3.10.1",
+    "maturin>=1.8.3",
+    "notebook>=7.3.3",
+    "pyright>=1.1.397",
+    "pytest>=8.3.5",
+    "ruff>=0.11.2",
 ]
 
 [tool.maturin]
@@ -20,11 +31,40 @@ python-source = "src"
 requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
-[dependency-groups]
-dev = [
-    "matplotlib>=3.10.1",
-    "maturin>=1.8.3",
-    "notebook>=7.3.3",
-    "pytest>=8.3.5",
-    "ruff>=0.11.2",
+[tool.pyright]
+include = ["src", "tests", "bench"]
+typeCheckingMode = "strict"
+reportUnnecessaryIsInstance = false
+reportUnknownParameterType = false
+reportUnknownArgumentType = false
+reportUnknownLambdaType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+
+[tool.black]
+# https://github.com/psf/black
+target-version = ["py310"]
+line-length = 120
+color = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+lint.select = ["ALL"]
+lint.ignore = [
+    "ANN401", # no typed Any
+    "B008", # do not perform function calls in argument defaults
+    "C901", # too complex functions
+    "D107", # missing docstring for '__init__'
+    "D203", # one blank line required before class docstring
+    "D205", # one blank line required after class docstring
+    "D213", # multi line summary should start at second line
+    "D401", # docstrings should start with non-imperative mood
+    "E501", # line too long, handled by black
+    "E731", # no lambdas
+    "F403", # disallow * import, otherwise allow at module level (F406)
+    "PLR0911", # too many return statements
+    "PLR2004", # magic values are sometimes useful
+    "PYI041", # use float instead of int | float, this clashes with typechecking
+    "S101", # do not use assert,
 ]

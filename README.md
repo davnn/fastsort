@@ -1,15 +1,18 @@
 # fastsort
 
-An exploration of fast Rust sorting algorithms in Python.
+A high-performance sorting library for NumPy arrays.
 
 ```py
 import numpy as np
 from fastsort import sort, argsort
 
-arr = np.random.randn(1000, 1000)
-sort_idx = argsort(arr, axis=-1)
-sort_arr = np.take_along_axis(arr, sort_idx, axis=-1)
-assert (sort_arr - sort(arr)).sum() == 0
+arr = np.array([3, 1, 2], dtype=np.int32)
+
+sorted_arr = sort(arr)
+# Output: array([1, 2, 3], dtype=int32)
+
+indices = argsort(arr)
+# Output: array([1, 2, 0], dtype=int32)
 ```
 
 Only two functions are exported: ``sort`` and ``argsort``. Both functions take an n-dimensional NumPy array as input, along with an optional axis. If the axis is None, the flattened array is sorted. The sorting is unstable and utilizes Rust's *sort_unstable* for parallel slices of arrays or *par_sort_unstable* for vectors.
