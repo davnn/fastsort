@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from fastsort import sort, argsort
+from fastsort import argsort, sort
 
 TestDataT = npt.NDArray[Any]
 TestAxisT = int | None
