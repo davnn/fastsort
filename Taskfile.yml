@@ -5,50 +5,63 @@ vars:
 
 tasks:
     lint:
+        desc: "Check code formatting and linting issues using Black and Ruff."
         cmds:
             - uv run black --diff --check --config pyproject.toml {{.SOURCES}}
             - uv run ruff check
 
     format:
+        desc: "Format code using Black and fix linting issues with Ruff."
         cmds:
             - uv run black --config pyproject.toml {{.SOURCES}}
             - uv run ruff check --config pyproject.toml --fix
 
     test:
+        desc: "Run tests using pytest with configuration from pyproject.toml."
         cmds:
             - uv run pytest -rsx -c pyproject.toml
 
     typing:
+        desc: "Perform static type checking using Pyright."
         cmd: uv run pyright
 
     typing-quality:
+        desc: "Check type completeness of the external fastsort API."
         cmd: uv run pyright --ignoreexternal --verifytypes fastsort
 
     check:
+        desc: "Run a check including linting, type checking, and tests."
         cmds:
             -   task: lint
             -   task: typing
             -   task: test
 
     build:
+        desc: "Build the project using Maturin in UV's build system."
         cmd: uv build
 
     install:
+        desc: "Install the project in editable mode."
         cmd: uv pip install --editable .
 
     reinstall:
-        cmd: uv pip install --no-deps --force-reinstall  --editable .
+        desc: "Reinstall the project in editable mode without dependencies."
+        cmd: uv pip install --no-deps --force-reinstall --editable .
 
     rebuild:
+        desc: "Rebuild and reinstall the project."
         cmds:
             - task: build
             - task: reinstall
 
     benchmark:
+        desc: "Run benchmarks using the benchmark script."
         cmd: uv run bench/benchmark.py {{.CLI_ARGS}}
 
     experiment:
+        desc: "Run experiments using the experiment script."
         cmd: uv run bench/experiment.py {{.CLI_ARGS}}
 
     visualize:
+        desc: "Generate visualizations from benchmark results."
         cmd: uv run bench/visualize.py {{.CLI_ARGS}}
