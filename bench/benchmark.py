@@ -1,5 +1,5 @@
 """Benchmark fastsort against different numpy sort algorithms.
-From https://github.com/liwt31/numpy-sort-benchmark/tree/master
+From https://github.com/liwt31/numpy-sort-benchmark/tree/master.
 """
 
 import argparse
@@ -14,6 +14,7 @@ import numpy as np
 import numpy.typing as npt
 
 from fastsort import argsort, sort
+from helpers.log_config import logger
 
 AREA_NUM: int = 10
 BUBBLE_SIZE: int = 10
@@ -39,7 +40,17 @@ class BenchmarkResult(TypedDict):
 
 
 class BenchSuite:
-    sort_kinds: list[str] = ["quicksort", "heapsort", "stable", "fast"]
+    """The benchmarking suite runs benchmarks over a number of registered benchmark functions.
+
+    A benchmark function can be registered using ``__call__`` of the instance and should be a
+    function of type ``BenchmarkFnT``. The rest of the benchmark configuration happens directly
+    in the run ``run`` method.
+
+    By default, the benchmark results are logged to stdout, but can be configured to be saved
+    as json reports as well (for later visualization).
+    """
+
+    sort_kinds: tuple[str, ...] = ("fast", "heapsort", "quicksort", "stable")
 
     def __init__(self) -> None:
         self.funcs: dict[str, BenchmarkFnT] = {}
@@ -53,6 +64,7 @@ class BenchSuite:
         seed: int,
         loops: int,
         size: int,
+        *,
         flatten: bool,
         contiguous: bool,
         use_argsort: bool,
@@ -60,14 +72,14 @@ class BenchSuite:
         report_folder: str,
     ) -> None:
         np.random.seed(seed)
-        print(f"Array size: {size}. Loop num: {loops}")
+        logger.info(f"Array size: {size}. Loop num: {loops}")
         sort_fn = argsort if use_argsort else sort
         sort_fn_np = np.argsort if use_argsort else np.sort
         report: list[BenchmarkReport] = []
 
         for name, func in self.funcs.items():
             base_time: float | None = None
-            print(f"Testing {name} array:")
+            logger.info(f"Testing {name} array:")
 
             for kind in self.sort_kinds:
                 times: list[float] = []
@@ -87,13 +99,14 @@ class BenchSuite:
 
                     times.append(time2 - time1)
 
-                times_ms = np.array(times) * 1e3  # from s to ms
+                times_ms = np.array(times, dtype=np.double) * 1e3  # from s to ms
                 mean, std = times_ms.mean(), times_ms.std()
                 base_time = mean if base_time is None else base_time
                 report.append({"name": name, "kind": kind, "time_mean": mean, "time_std": std})
 
-                print(f"    {kind}: {mean:.3f}±{std:.3f} us per loop. Relative: {mean/base_time*100:.0f}%")
-            print()
+                logger.info(f"    {kind}: {mean:.3f}±{std:.3f} us per loop. Relative: {mean/base_time*100:.0f}%")
+
+            logger.info("--- run complete ---")
 
         if write_report:
             timestamp = datetime.datetime.now().strftime(r"%Y-%m-%d_%H-%M-%S")
@@ -108,7 +121,7 @@ class BenchSuite:
             }
             script_dir = Path(__file__).resolve().parent / report_folder
             script_dir.mkdir(exist_ok=True)
-            with open(script_dir / f"{timestamp}-report.json", "w") as f:
+            with (script_dir / f"{timestamp}-report.json").open("w") as f:
                 json.dump(benchmark_result, f, indent=4)
 
 

@@ -1,22 +1,22 @@
 import argparse
 import json
-import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from benchmark import BenchmarkResult
 from matplotlib import cm
 
+from benchmark import BenchmarkResult
+from helpers.log_config import logger
 
-def plot_sorting_algorithms_time_comparison(data: BenchmarkResult, output_path: str) -> None:
+
+def plot_sorting_algorithms_time_comparison(data: BenchmarkResult, output_path: Path) -> None:
     """Plots a comparison of sorting algorithms" mean execution times across various input types
     and saves the plot as a PNG file.
 
-    Parameters
-    ----------
-    - data (dict[str, Any]): The input data containing sorting algorithms" execution times for different input types.
-    - output_path (str): The path where the plot should be saved.
+    Args:
+        data (dict[str, Any]): The input data containing sorting algorithms" execution times for different input types.
+        output_path (Path): The path where the plot should be saved.
 
     """
     # Extract the relevant information from the data
@@ -66,7 +66,7 @@ def plot_sorting_algorithms_time_comparison(data: BenchmarkResult, output_path: 
         bars = ax.bar(x_positions + width * idx, kind_data, width, label=kind, yerr=kind_error, capsize=5)
 
         # Set the colors of the bars using the colormap
-        for i, bar in enumerate(bars):
+        for bar in bars:
             bar.set_color(cmap(idx / len(unique_kinds)))  # Normalize index to the colormap
 
         # Annotate each bar with percentage deviation from the "fast" algorithm
@@ -109,7 +109,7 @@ def plot_sorting_algorithms_time_comparison(data: BenchmarkResult, output_path: 
     ax.legend(title="Algorithm", loc="upper right", fontsize=12)
 
     # Add grid for better readability
-    ax.grid(True, axis="y", linestyle="--", alpha=0.7)
+    ax.grid(visible=True, axis="y", linestyle="--", alpha=0.7)
 
     # Save the plot as PNG
     plt.tight_layout()
@@ -117,50 +117,41 @@ def plot_sorting_algorithms_time_comparison(data: BenchmarkResult, output_path: 
     plt.close()
 
 
-def load_data_from_json(file_path: str) -> BenchmarkResult:
+def load_data_from_json(file_path: Path) -> BenchmarkResult:
     """Loads the JSON data from the specified file path.
 
-    Parameters
-    ----------
-    - file_path (str): The path to the JSON file to be loaded.
+    Args:
+        file_path (Path): The path to the JSON file to be loaded.
 
-    Returns
-    -------
-    - dict: The data loaded from the JSON file.
+    Returns:
+        dict: The data loaded from the JSON file.
 
     """
-    with open(file_path) as file:
-        data = json.load(file)
-    return data
+    with file_path.open() as file:
+        return json.load(file)
 
 
-def process_reports(input_folder: str) -> None:
+def process_reports(input_folder: Path) -> None:
     """Iterates over all JSON files in the given folder, processes each report, and saves the plot.
 
-    Parameters
-    ----------
-    - input_folder (str): Path to the folder containing the JSON report files.
+    Args:
+        input_folder (str): Path to the folder containing the JSON report files.
 
     """
     # Iterate through all files in the folder
-    for file_name in os.listdir(input_folder):
-        file_path = os.path.join(input_folder, file_name)
+    for file_path in input_folder.glob("*.json"):
+        try:
+            # Load the JSON data
+            data: BenchmarkResult = load_data_from_json(file_path)
 
-        # Only process JSON files
-        if file_name.endswith(".json"):
-            try:
-                # Load the JSON data
-                data: BenchmarkResult = load_data_from_json(file_path)
+            # Define output PNG file path
+            output_path = input_folder / f"{file_path.stem}.png"
 
-                # Define output PNG file path
-                output_file = os.path.splitext(file_name)[0] + ".png"
-                output_path = os.path.join(input_folder, output_file)
-
-                # Plot and save the comparison chart
-                plot_sorting_algorithms_time_comparison(data, output_path)
-                print(f"Saved plot for {file_name} as {output_file}")
-            except Exception as e:
-                print(f"Failed to process {file_name}: {e}")
+            # Plot and save the comparison chart
+            plot_sorting_algorithms_time_comparison(data, output_path)
+            logger.info(f"Saved plot for {file_path.name} as {output_path.name}")
+        except Exception as e:  # noqa
+            logger.error(f"Failed to process {file_path.name}: {e}")
 
 
 if __name__ == "__main__":
@@ -175,4 +166,4 @@ if __name__ == "__main__":
     script_dir = Path(__file__).resolve().parent / args.folder
 
     # Process reports in the given folder
-    process_reports(str(script_dir))
+    process_reports(script_dir)

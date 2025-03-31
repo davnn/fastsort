@@ -62,6 +62,7 @@ reportUnknownArgumentType = false
 reportUnknownLambdaType = false
 reportUnknownVariableType = false
 reportUnknownMemberType = false
+reportMissingTypeIgnoreComment = false
 
 [tool.black]
 # https://github.com/psf/black
@@ -70,6 +71,7 @@ line-length = 120
 color = true
 
 [tool.ruff]
+src = ["src", "tests", "bench"]
 target-version = "py310"
 line-length = 120
 lint.select = ["ALL"]
@@ -85,8 +87,13 @@ lint.ignore = [
     "E501", # line too long, handled by black
     "E731", # no lambdas
     "F403", # disallow * import, otherwise allow at module level (F406)
+    "PGH004", # require specific codes to disable lint
     "PLR0911", # too many return statements
     "PLR2004", # magic values are sometimes useful
     "PYI041", # use float instead of int | float, this clashes with typechecking
     "S101", # do not use assert,
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"bench/**" = ["A001", "D100", "D101", "D102", "D103", "DTZ005", "INP001", "NPY002", "PLR0913"]
+"tests/**" = ["D100", "D101", "D102", "D103"]
