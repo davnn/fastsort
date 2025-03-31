@@ -12,7 +12,7 @@ sorted_arr = sort(arr)
 # Output: array([1, 2, 3], dtype=int32)
 
 indices = argsort(arr)
-# Output: array([1, 2, 0], dtype=int32)
+# Output: array([1, 2, 0])
 ```
 
 Only two functions are exported: ``sort`` and ``argsort``. Both functions take an n-dimensional NumPy array as input, along with an optional axis. If the axis is None, the flattened array is sorted. The sorting is unstable and utilizes Rust's *sort_unstable* for parallel slices of arrays or *par_sort_unstable* for vectors.
